@@ -309,8 +309,8 @@
   <svg id="icoOff" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
 </button>
 <div id="playerBox" class="open">
-  <iframe id="bgmFrame" src="" data-bgm="https://music.163.com/outchain/player?type=2&id=3443085323&auto=1&height=66"
-    allow="autoplay" title="背景音乐"></iframe>
+  <audio id="bgmAudio" src="https://raw.githubusercontent.com/qiluoyan/-2.0/main/bgm.mp3"
+    preload="auto" loop title="背景音乐"></audio>
 </div>
 
 <script>
@@ -443,15 +443,12 @@
   /* 开场 */
   var splash=document.getElementById("splash");
   function reloadMusic(){
-    var box=document.getElementById("playerBox");
-    var f=document.getElementById("bgmFrame");
-    var base=(f&&f.getAttribute("data-bgm"))||"https://music.163.com/outchain/player?type=2&id=3443085323&auto=1&height=66";
-    var nf=document.createElement("iframe");
-    nf.id="bgmFrame";
-    nf.src=base+"&t="+Date.now();
-    nf.setAttribute("allow","autoplay");
-    nf.title="背景音乐";
-    if(box){box.innerHTML="";box.appendChild(nf);}
+    var a=document.getElementById("bgmAudio");
+    if(a){
+      a.volume=1;
+      var p=a.play();
+      if(p&&p.catch)p.catch(function(){});
+    }
   }
   function dismissSplash(){
     ac();if(AC&&AC.state==="suspended")AC.resume();
@@ -594,13 +591,16 @@
 
   /* 音乐 */
   var musicBtn=document.getElementById("musicBtn");
-  var playerBox=document.getElementById("playerBox");
+  var bgmAudio=document.getElementById("bgmAudio");
   var musicOn=true;
   musicBtn.addEventListener("click",function(e){
     e.stopPropagation();
     sndClick();
     musicOn=!musicOn;
-    playerBox.classList.toggle("open",musicOn);
+    if(bgmAudio){
+      if(musicOn){var p=bgmAudio.play(); if(p&&p.catch)p.catch(function(){});}
+      else{bgmAudio.pause();}
+    }
     document.getElementById("icoOn").style.display=musicOn?"":"none";
     document.getElementById("icoOff").style.display=musicOn?"none":"";
   });
