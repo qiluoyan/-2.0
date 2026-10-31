@@ -444,10 +444,20 @@
   var splash=document.getElementById("splash");
   function reloadMusic(){
     var a=document.getElementById("bgmAudio");
-    if(a){
-      a.volume=1;
+    if(!a)return;
+    a.volume=1;
+    function tryPlay(){
       var p=a.play();
       if(p&&p.catch)p.catch(function(){});
+    }
+    tryPlay();
+    /* iOS：若音频尚未加载就绪，play() 会被系统拒绝，等就绪后补播 */
+    if(a.readyState<3){
+      var once=function(){tryPlay();};
+      a.addEventListener("loadeddata",once,{once:true});
+      a.addEventListener("canplay",once,{once:true});
+      setTimeout(tryPlay,1500);
+      setTimeout(tryPlay,3000);
     }
   }
   function dismissSplash(){
